@@ -1,0 +1,14 @@
+# Define the menu links for this module
+
+entity.wbumenudomain.collection:
+  title: 'Wbumenudomain Entity: Wbumenudomain Listing'
+  route_name: entity.wbumenudomain.collection
+  description: 'List Wbumenudomain'
+  parent: system.admin_structure
+  weight: 10
+
+wbumenudomain.admin.structure.settings:
+  title: 'Wbumenudomain Settings'
+  description: 'Configure Wbumenudomain entity'
+  route_name:  wbumenudomain.wbumenudomain_settings
+  parent: system.admin_structure

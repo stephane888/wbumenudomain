@@ -1,0 +1,59 @@
+# This file brings everything together. Very nifty!
+
+# Route name can be used in several places; e.g. links, redirects, and local
+# actions.
+entity.wbumenudomain.canonical:
+  path: '/wbumenudomain/{wbumenudomain}'
+  defaults:
+  # Calls the view controller, defined in the annotation of the contact entity
+    _entity_view: 'wbumenudomain'
+    _title: 'Wbumenudomain Content'
+  requirements:
+  # Calls the access controller of the entity, $operation 'view'
+    _entity_access: 'wbumenudomain.view'
+
+entity.wbumenudomain.collection:
+  path: '/wbumenudomain/list'
+  defaults:
+  # Calls the list controller, defined in the annotation of the contact entity.
+    _entity_list: 'wbumenudomain'
+    _title: 'Wbumenudomain List'
+  requirements:
+  # Checks for permission directly.
+    _permission: 'Administer wbumenudomain entity'
+
+wbumenudomain.add:
+  path: '/wbumenudomain/add'
+  defaults:
+  # Calls the form.add controller, defined in the contact entity.
+    _entity_form: wbumenudomain.add
+    _title: 'Add Wbumenudomain'
+  requirements:
+    _entity_create_access: 'wbumenudomain'
+
+entity.wbumenudomain.edit_form:
+  path: '/wbumenudomain/{wbumenudomain}/edit'
+  defaults:
+  # Calls the form.edit controller, defined in the contact entity.
+    _entity_form: wbumenudomain.edit
+    _title: 'Edit Wbumenudomain'
+  requirements:
+    _entity_access: 'wbumenudomain.edit'
+
+entity.wbumenudomain.delete_form:
+  path: '/contact/{wbumenudomain}/delete'
+  defaults:
+    # Calls the form.delete controller, defined in the contact entity.
+    _entity_form: wbumenudomain.delete
+    _title: 'Delete Wbumenudomain'
+  requirements:
+    _entity_access: 'wbumenudomain.delete'
+
+wbumenudomain.wbumenudomain_settings:
+  path: 'admin/structure/wbumenudomain_settings'
+  defaults:
+    _form: '\Drupal\wbumenudomain\Form\WbumenudomainSettingsForm'
+    _title: 'Wbumenudomain Settings'
+  requirements:
+    _permission: 'Administer wbumenudomain entity'
+

@@ -1,0 +1,22 @@
+# Define the 'local' links for the module
+
+wbumenudomain.settings_tab:
+  route_name: wbumenudomain.wbumenudomain_settings
+  title: Settings
+  base_route: wbumenudomain.wbumenudomain_settings
+
+wbumenudomain.view:
+  route_name: entity.wbumenudomain.canonical
+  base_route: entity.wbumenudomain.canonical
+  title: View
+
+wbumenudomain.page_edit:
+  route_name: entity.wbumenudomain.edit_form
+  base_route: entity.wbumenudomain.canonical
+  title: Edit
+
+wbumenudomain.delete_confirm:
+  route_name:  entity.wbumenudomain.delete_form
+  base_route:  entity.wbumenudomain.canonical
+  title: Delete
+  weight: 10

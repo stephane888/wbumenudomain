@@ -1,0 +1,20 @@
+administer wbumenudomain configuration:
+  title: 'Administer wbumenudomain configuration'
+  description: 'Optional description.'
+  restrict access: true
+
+view wbumenudomain entity:
+  title: 'View wbumenudomain entity'
+
+add wbumenudomain entity:
+  title: 'Add wbumenudomain entity'
+
+edit wbumenudomain entity:
+  title: 'Edit wbumenudomain Entity'
+
+delete wbumenudomain entity:
+  title: 'Delete wbumenudomain entity'
+
+administer wbumenudomain entity:
+  title: 'Administer wbumenudomain entity'
+  restrict access: TRUE
