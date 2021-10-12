@@ -1,0 +1,13 @@
+services:
+  wbumenudomain.menu_item.decorating:
+    class: Drupal\wbumenudomain\WbumenudomainMenuItemDecorating
+    arguments: ['@access_manager', '@current_user', '@entity_type.manager']
+    decorates: menu.default_tree_manipulators
+    decoration_priority: 50
+
+  wbumenudomain.site_config:
+    class: Drupal\wbumenudomain\Services\WbumenudomainSiteconfig
+    arguments: ['@config.factory']
+
+  wbumenudomain.themeutility:
+    class: Stephane888\HtmlBootstrap\ThemeUtility

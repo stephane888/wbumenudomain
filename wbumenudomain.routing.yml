@@ -57,3 +57,11 @@ wbumenudomain.wbumenudomain_settings:
   requirements:
     _permission: 'Administer wbumenudomain entity'
 
+#######################################################
+#wbumenudomain.realisations:
+#  path: '/nos-realisations'
+#  defaults:
+#    _controller: '\Drupal\wbumenudomain\Controller\PagesController::Pages'
+
+
+
