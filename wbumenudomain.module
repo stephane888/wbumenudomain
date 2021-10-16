@@ -155,6 +155,7 @@ function wbumenudomain_views_data_alter(array &$data)
             'help' => t('Filters out nodes available on current domain (published to current domain or all affiliates).')
         ]
     ];
+    
     /**
      * Cet block de code permet d'alterer la condition where des requetes mysql.
      * Ce block de code permet d'etendre la clause where de la table
@@ -191,10 +192,8 @@ function wbumenudomain_views_data_alter(array &$data)
 function wbumenudomain_entity_access(\Drupal\Core\Entity\EntityInterface $entity, $operation, \Drupal\Core\Session\AccountInterface $account)
 {
     if ("menu_link_content" === $entity->getEntityTypeId()) {
-        // dump($entity->getEntityTypeId());
         return AccessResult::allowed();
     }
-    // return AccessResult::neutral();
 }
 
 
