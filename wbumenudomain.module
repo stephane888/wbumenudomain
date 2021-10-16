@@ -4,13 +4,18 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\domain_access\DomainAccessManagerInterface;
+use Drupal\Core\Access\AccessResult;
+use Drupal\wbumenudomain\WbumenudomainMenuItemDecorating;
 use Stephane888\Debug\debugLog;
 
 /**
  * implement hook_entity_base_field_info
+ * use command to update : vendor/bin/drush entup
  *
  * @file
  * Primary module hooks for wbumenudomain module.
+ *
+ * @see https://www.drupal.org/docs/drupal-apis/entity-api/fieldtypes-fieldwidgets-and-fieldformatters to get all types BaseFieldDefinition;
  *
  * @DCG
  * This file is no longer required in Drupal 8.
@@ -43,7 +48,20 @@ function wbumenudomain_entity_base_field_info(EntityTypeInterface $entity_type)
             'weight' => - 3
         ]);
         return $fields;
+    } elseif ($entity_type->id() === "commerce_product") {
+
+        $list = \Drupal::entityTypeManager()->getStorage('domain')->loadOptionsList();
+        $domain = WbumenudomainMenuItemDecorating::getCurrentActiveDomaineByUrl();
+        $fields[DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD] = BaseFieldDefinition::create('string')->setLabel(t(' Domain Access '))
+            ->setRequired(TRUE)
+            ->setDisplayConfigurable('form', TRUE)
+            ->setDisplayConfigurable('view', TRUE)
+            ->setDisplayOptions('form', [])
+            ->setDefaultValue($domain);
+        return $fields;
     }
+    debugLog::$max_depth = 1;
+    debugLog::kintDebugDrupal($entity_type, 'wbumenudomain_entity_base_field_info', true);
     return $fields;
 }
 
@@ -55,7 +73,8 @@ function wbumenudomain_entity_base_field_info(EntityTypeInterface $entity_type)
  */
 function wbumenudomain_theme_suggestions_page_alter(array &$suggestions, array $variables)
 {
-    // if (str_contains(\Drupal::routeMatch()->getRouteName(), "wbumenudomain.")) {
+    // if (str_contains(\Drupal::routeMatch()->getRouteName(), "wbumenudomain."))
+    // {
     // $suggestions[] = 'page__wbumenudomain';
     // }
     if (str_contains(\Drupal::routeMatch()->getRouteName(), "view.page_menu_principal")) {
@@ -94,12 +113,16 @@ function _wbumenudomain_siteconfig_alter($form, FormStateInterface $form_state)
     // $form_state->setUserInput([]);
     // return $form;
     // debugLog::$max_depth = 10;
-    // debugLog::kintDebugDrupal($form_state->getValues(), '_wbumenudomain_siteconfig_getValues');
+    // debugLog::kintDebugDrupal($form_state->getValues(),
+    // '_wbumenudomain_siteconfig_getValues');
 
     // name
-    // $form['field_site_information']['widget'][0]['siteconf']['container']['name']["#value"] = $form['field_site_information']['widget'][0]['siteconf']['container']['name']["#default_value"];
+    // $form['field_site_information']['widget'][0]['siteconf']['container']['name']["#value"]
+    // =
+    // $form['field_site_information']['widget'][0]['siteconf']['container']['name']["#default_value"];
     //
-    // debugLog::kintDebugDrupal($form['field_site_information']['widget'][0]['siteconf']['container']['name'], '_wbumenudomain_siteconfig_alter');
+    // debugLog::kintDebugDrupal($form['field_site_information']['widget'][0]['siteconf']['container']['name'],
+    // '_wbumenudomain_siteconfig_alter');
     // dump($form_state->getValue('field_site_information'));
     return $form['field_site_information']['widget'][0]['siteconf']['container'];
 }
@@ -110,13 +133,17 @@ function _wbumenudomain_siteconfig_alter($form, FormStateInterface $form_state)
 function wbumenudomain_views_data_alter(array &$data)
 {
     // debugLog::$max_depth = 7;
-    // debugLog::kintDebugDrupal($data['block_content_field_data'], 'wbumenudomain_views_data_alter' . rand(10, 999));
+    // debugLog::kintDebugDrupal($data['block_content_field_data'],
+    // 'wbumenudomain_views_data_alter' . rand(10, 999));
     /**
      * --
      */
-    // $data['block_content_field_data'][DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD]['field']['id'] = 'domain_access_field';
-    // $data['block_content_field_data'][DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD . '_target_id']['filter']['id'] = 'domain_access_filter';
-    // $data['block_content_field_data'][DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD . '_target_id']['argument']['id'] = 'domain_access_argument';
+    // $data['block_content_field_data'][DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD]['field']['id']
+    // = 'domain_access_field';
+    // $data['block_content_field_data'][DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD
+    // . '_target_id']['filter']['id'] = 'domain_access_filter';
+    // $data['block_content_field_data'][DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD
+    // . '_target_id']['argument']['id'] = 'domain_access_argument';
     // // Current domain filter.
     $data['block_content_field_data']['current_domaine'] = [
         'title' => t('Current domain'),
@@ -130,10 +157,14 @@ function wbumenudomain_views_data_alter(array &$data)
     ];
     /**
      * Cet block de code permet d'alterer la condition where des requetes mysql.
-     * Ce block de code permet d'etendre la clause where de la table node_field_data. on identifier notre filtre avec la clée node_type_filter, puis on ajoute un filtre "filter".
+     * Ce block de code permet d'etendre la clause where de la table
+     * node_field_data. on identifier notre filtre avec la clée node_type_filter,
+     * puis on ajoute un filtre "filter".
      * Deux elements sont important :
      * - filed => correspond à la colonne
-     * - id => cest l'id du plugin à utilise. ( la liste des plugin est disponible ici : https://api.drupal.org/api/drupal/core!modules!views!src!Plugin!views!filter!FilterPluginBase.php/group/views_filter_handlers/8.2.x)
+     * - id => cest l'id du plugin à utilise. ( la liste des plugin est disponible
+     * ici :
+     * https://api.drupal.org/api/drupal/core!modules!views!src!Plugin!views!filter!FilterPluginBase.php/group/views_filter_handlers/8.2.x)
      */
     $data['node_field_data']['node_type_filter'] = array(
         'title' => t('Enhanced node type filter'),
@@ -146,8 +177,25 @@ function wbumenudomain_views_data_alter(array &$data)
     );
 }
 
-
-
+/**
+ * Ce code sert de correction à l'affichage des données via menu_lin_content
+ * pour les utilisateurs anonyme.
+ * https://www.drupal.org/project/menu_item_extras/issues/2925283
+ * https://www.drupal.org/project/menu_item_extras/issues/3178103
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param string $operation
+ * @param \Drupal\Core\Session\AccountInterface $account
+ * @return boolean
+ */
+function wbumenudomain_entity_access(\Drupal\Core\Entity\EntityInterface $entity, $operation, \Drupal\Core\Session\AccountInterface $account)
+{
+    if ("menu_link_content" === $entity->getEntityTypeId()) {
+        // dump($entity->getEntityTypeId());
+        return AccessResult::allowed();
+    }
+    // return AccessResult::neutral();
+}
 
 
 

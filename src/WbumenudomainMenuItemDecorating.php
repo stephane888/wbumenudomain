@@ -27,7 +27,7 @@ class WbumenudomainMenuItemDecorating extends DefaultMenuLinkTreeManipulators
     public function __construct(AccessManagerInterface $access_manager, AccountInterface $account, EntityTypeManagerInterface $entity_type_manager)
     {
         parent::__construct($access_manager, $account, $entity_type_manager);
-        $this->CurrentHostName = $this->convertStringTomachineName($_SERVER['HTTP_HOST']);
+        $this->CurrentHostName = self::getCurrentActiveDomaineByUrl();
         $this->getCurrentWbumenudomain();
     }
 
@@ -36,7 +36,7 @@ class WbumenudomainMenuItemDecorating extends DefaultMenuLinkTreeManipulators
      *
      * @param \Drupal\Core\Menu\MenuLinkInterface $instance
      *            The menu link instance.
-     *            
+     *
      * @return \Drupal\Core\Access\AccessResultInterface The access result.
      */
     protected function menuLinkCheckAccess(MenuLinkInterface $link)
@@ -45,6 +45,7 @@ class WbumenudomainMenuItemDecorating extends DefaultMenuLinkTreeManipulators
         $metadata = $link->getMetaData();
         $menuName = $link->getMenuName();
         if ($menuName == 'main' && ! empty($metadata['entity_id'])) {
+
             // $this->entityTypeManager->getStorage('menu_link_content')->load($metadata['entity_id']);
             if (! in_array($metadata['entity_id'], $this->Wbumenudomain)) {
                 $access_result = AccessResult::forbidden();
@@ -98,13 +99,24 @@ class WbumenudomainMenuItemDecorating extends DefaultMenuLinkTreeManipulators
                 $this->Wbumenudomain = reset($this->Wbumenudomain);
                 $this->Wbumenudomain = Json::decode($this->Wbumenudomain['value']);
             }
+        } else {
+            \Drupal::messenger()->addWarning("Ce domaine n'est pas encore configurée");
         }
     }
 
-    private function convertStringTomachineName($new_value)
+    static public function getCurrentActiveDomaineByUrl()
     {
-        $new_value = strtolower($new_value);
-        $new_value = preg_replace('/[^a-z0-9_]+/', '_', $new_value);
-        return preg_replace('/_+/', '_', $new_value);
+        /**
+         *
+         * @var \Drupal\domain\DomainNegotiator $DomainNegotiator
+         */
+        $DomainNegotiator = \Drupal::service('domain.negotiator');
+        $domain = $DomainNegotiator->getActiveId();
+        if (empty($domain))
+            \Drupal::messenger()->addWarning("Ce domaine n'est pas encore enregitré, ");
+        return $domain;
+        // $new_value = strtolower($_SERVER['HTTP_HOST']);
+        // $new_value = preg_replace('/[^a-z0-9_]+/', '_', $new_value);
+        // return preg_replace('/_+/', '_', $new_value);
     }
 }
