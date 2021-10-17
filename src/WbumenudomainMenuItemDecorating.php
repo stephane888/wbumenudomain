@@ -110,13 +110,13 @@ class WbumenudomainMenuItemDecorating extends DefaultMenuLinkTreeManipulators
          *
          * @var \Drupal\domain\DomainNegotiator $DomainNegotiator
          */
-        $DomainNegotiator = \Drupal::service('domain.negotiator');
-        $domain = $DomainNegotiator->getActiveId();
-        if (empty($domain))
-            \Drupal::messenger()->addWarning("Ce domaine n'est pas encore enregitré, ");
-        return $domain;
-        // $new_value = strtolower($_SERVER['HTTP_HOST']);
-        // $new_value = preg_replace('/[^a-z0-9_]+/', '_', $new_value);
-        // return preg_replace('/_+/', '_', $new_value);
+        // $DomainNegotiator = \Drupal::service('domain.negotiator');
+        // $domain = $DomainNegotiator->getActiveId();
+        // if (empty($domain))
+        // \Drupal::messenger()->addWarning("Ce domaine n'est pas encore enregitré, ");
+        // return $domain;
+        $new_value = strtolower($_SERVER['HTTP_HOST']);
+        $new_value = preg_replace('/[^a-z0-9_]+/', '_', $new_value);
+        return preg_replace('/_+/', '_', $new_value);
     }
 }

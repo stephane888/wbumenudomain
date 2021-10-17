@@ -50,19 +50,38 @@ function wbumenudomain_entity_base_field_info(EntityTypeInterface $entity_type)
         return $fields;
     } elseif ($entity_type->id() === "commerce_product") {
 
-        $list = \Drupal::entityTypeManager()->getStorage('domain')->loadOptionsList();
-        $domain = WbumenudomainMenuItemDecorating::getCurrentActiveDomaineByUrl();
         $fields[DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD] = BaseFieldDefinition::create('string')->setLabel(t(' Domain Access '))
             ->setRequired(TRUE)
             ->setDisplayConfigurable('form', TRUE)
             ->setDisplayConfigurable('view', TRUE)
-            ->setDisplayOptions('form', [])
-            ->setDefaultValue($domain);
+            ->setDisplayOptions('form', [
+            'type' => 'text_textfield'
+        ])
+            ->setReadOnly(TRUE);
+
         return $fields;
     }
-    debugLog::$max_depth = 1;
-    debugLog::kintDebugDrupal($entity_type, 'wbumenudomain_entity_base_field_info', true);
+    // debugLog::$max_depth = 1;
+    // debugLog::kintDebugDrupal($entity_type, $entity_type->id(), true);
     return $fields;
+}
+
+/**
+ * implement hook_form_FORM_ID_alter
+ *
+ * @param array $form
+ * @param FormStateInterface $form_state
+ * @param string $form_id
+ */
+function wbumenudomain_form_commerce_product_form_alter(&$form, FormStateInterface $form_state, $form_id)
+{
+    if (! empty($form['field_domain_access'])) {
+        $domain = WbumenudomainMenuItemDecorating::getCurrentActiveDomaineByUrl();
+        $form['field_domain_access']['widget'][0]['value']['#default_value'] = $domain;
+        if (! in_array('administrator', \Drupal::currentUser()->getRoles()))
+            $form['field_domain_access']['widget'][0]['value']['#access'] = false;
+        $form['field_domain_access']['widget'][0]['value']['#attributes']['readonly'] = 'readonly';
+    }
 }
 
 /**
@@ -155,27 +174,47 @@ function wbumenudomain_views_data_alter(array &$data)
             'help' => t('Filters out nodes available on current domain (published to current domain or all affiliates).')
         ]
     ];
-    
+
     /**
+     * Code example .
      * Cet block de code permet d'alterer la condition where des requetes mysql.
      * Ce block de code permet d'etendre la clause where de la table
      * node_field_data. on identifier notre filtre avec la clée node_type_filter,
      * puis on ajoute un filtre "filter".
      * Deux elements sont important :
-     * - filed => correspond à la colonne
+     * - field => correspond à la colonne
      * - id => cest l'id du plugin à utilise. ( la liste des plugin est disponible
      * ici :
      * https://api.drupal.org/api/drupal/core!modules!views!src!Plugin!views!filter!FilterPluginBase.php/group/views_filter_handlers/8.2.x)
      */
-    $data['node_field_data']['node_type_filter'] = array(
-        'title' => t('Enhanced node type filter'),
-        'filter' => array(
-            'title' => t('Enhanced node type filter'),
-            'help' => t('Provides a custom filter for nodes by their type.'),
-            'field' => 'type',
-            'id' => 'string'
-        )
-    );
+    // $data['node_field_data']['node_type_filter'] = array(
+    // 'title' => t('Enhanced node type filter'),
+    // 'filter' => array(
+    // 'title' => t('Enhanced node type filter'),
+    // 'help' => t('Provides a custom filter for nodes by their type.'),
+    // 'field' => 'type',
+    // 'id' => 'string'
+    // )
+    // );
+
+    /**
+     * Ajout du filtre de domain pour les produits.
+     * on identifie notre filtre avec 'product_field_domain_access'.
+     * la colonne est definie : 'field'
+     * la requete est cree par 'id'
+     */
+    if (! empty($data['commerce_product_field_data'])) {
+        $data['commerce_product_field_data']['product_field_domain_access'] = [
+            'title' => t('Current domain'),
+            'group' => t('Domain'),
+            'filter' => [
+                'field' => DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD,
+                'id' => 'wbumenudomain_current_domain_product',
+                'title' => t('Available on current domain product'),
+                'help' => t('Filters out nodes available on current domain (published to current domain or all affiliates).')
+            ]
+        ];
+    }
 }
 
 /**
@@ -192,7 +231,35 @@ function wbumenudomain_views_data_alter(array &$data)
 function wbumenudomain_entity_access(\Drupal\Core\Entity\EntityInterface $entity, $operation, \Drupal\Core\Session\AccountInterface $account)
 {
     if ("menu_link_content" === $entity->getEntityTypeId()) {
+        if ($operation == "view")
+            return AccessResult::allowed();
+    }
+}
+
+/**
+ * implement hook_ENTITY_TYPE_access
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param string $operation
+ * @param \Drupal\Core\Session\AccountInterface $account
+ */
+function wbumenudomain_commerce_product_access(\Drupal\commerce_product\Entity\Product $product, $operation, \Drupal\Core\Session\AccountInterface $account)
+{
+    if (in_array('administrator', $account->getRoles())) {
         return AccessResult::allowed();
+    }
+    if ($operation === 'add') {
+        return AccessResult::allowed();
+    } else {
+        $domain = $product->get(DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD)->getValue();
+        if (! empty($domain)) {
+            $domainProduct = reset($domain);
+            $condition = $domainProduct['value'] == WbumenudomainMenuItemDecorating::getCurrentActiveDomaineByUrl() ? true : false;
+        }
+        if (empty($condition))
+            return AccessResult::forbidden(" Ce produit n'existe plus ou a été desactivé par ladministrateur.");
+        else
+            return AccessResult::allowed();
     }
 }
 
