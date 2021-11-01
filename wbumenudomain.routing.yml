@@ -50,7 +50,7 @@ entity.wbumenudomain.delete_form:
     _entity_access: 'wbumenudomain.delete'
 
 wbumenudomain.wbumenudomain_settings:
-  path: 'admin/structure/wbumenudomain_settings'
+  path: '/admin/structure/wbumenudomain_settings'
   defaults:
     _form: '\Drupal\wbumenudomain\Form\WbumenudomainSettingsForm'
     _title: 'Wbumenudomain Settings'

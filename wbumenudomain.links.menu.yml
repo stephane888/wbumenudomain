@@ -1,7 +1,7 @@
 # Define the menu links for this module
 
 entity.wbumenudomain.collection:
-  title: 'Wbumenudomain Entity: Wbumenudomain Listing'
+  title: 'Gestion des domaines'
   route_name: entity.wbumenudomain.collection
   description: 'List Wbumenudomain'
   parent: system.admin_structure
