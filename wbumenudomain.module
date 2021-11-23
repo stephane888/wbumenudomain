@@ -15,55 +15,42 @@ use Stephane888\Debug\debugLog;
  * @file
  * Primary module hooks for wbumenudomain module.
  *
- * @see https://www.drupal.org/docs/drupal-apis/entity-api/fieldtypes-fieldwidgets-and-fieldformatters to get all types BaseFieldDefinition;
- *
+ * @see https://www.drupal.org/docs/drupal-apis/entity-api/fieldtypes-fieldwidgets-and-fieldformatters
+ *      to get all types BaseFieldDefinition;
+ *     
  * @DCG
  * This file is no longer required in Drupal 8.
  * @see https://www.drupal.org/node/2217931
  */
-function wbumenudomain_entity_base_field_info(EntityTypeInterface $entity_type)
-{
-    $fields = [];
-    if ($entity_type->id() == 'menu_link_content') {
-        $fields['wbumenudomain_roles'] = BaseFieldDefinition::create('entity_reference')->setName('wbumenudomain_roles')
-            ->setTargetEntityTypeId('menu_link_content')
-            ->setLabel(t(" Limite l'affichage du lien pour les roles selectionnées "))
-            ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
-            ->setSetting('target_type', 'user_role')
-            ->setDisplayOptions('form', [
-            'type' => 'options_buttons',
-            'weight' => 0
-        ]);
-        return $fields;
-    } elseif ($entity_type->id() === 'block_content') {
-        $list = \Drupal::entityTypeManager()->getStorage('domain')->loadOptionsList();
-        $fields[DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD] = BaseFieldDefinition::create('list_string')->setLabel(t(' Domain Access '))
-            ->setRequired(FALSE)
-            ->setSetting('allowed_values', $list)
-            ->setDisplayConfigurable('form', TRUE)
-            ->setDisplayConfigurable('view', TRUE)
-            ->setDisplayOptions('form', [
-            'type' => 'options_select',
-            'settings' => [],
-            'weight' => - 3
-        ]);
-        return $fields;
-    } elseif ($entity_type->id() === "commerce_product") {
-
-        $fields[DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD] = BaseFieldDefinition::create('string')->setLabel(t(' Domain Access '))
-            ->setRequired(TRUE)
-            ->setDisplayConfigurable('form', TRUE)
-            ->setDisplayConfigurable('view', TRUE)
-            ->setDisplayOptions('form', [
-            'type' => 'text_textfield'
-        ])
-            ->setReadOnly(TRUE);
-
-        return $fields;
-    }
-    // debugLog::$max_depth = 1;
-    // debugLog::kintDebugDrupal($entity_type, $entity_type->id(), true);
+function wbumenudomain_entity_base_field_info(EntityTypeInterface $entity_type) {
+  $fields = [];
+  if ($entity_type->id() == 'menu_link_content') {
+    $fields['wbumenudomain_roles'] = BaseFieldDefinition::create('entity_reference')->setName('wbumenudomain_roles')->setTargetEntityTypeId('menu_link_content')->setLabel(t(" Limite l'affichage du lien pour les roles selectionnées "))->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)->setSetting('target_type', 'user_role')->setDisplayOptions('form', [
+      'type' => 'options_buttons',
+      'weight' => 0
+    ]);
     return $fields;
+  }
+  elseif ($entity_type->id() === 'block_content') {
+    $list = \Drupal::entityTypeManager()->getStorage('domain')->loadOptionsList();
+    $fields[DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD] = BaseFieldDefinition::create('list_string')->setLabel(t(' Domain Access '))->setRequired(FALSE)->setSetting('allowed_values', $list)->setDisplayConfigurable('form', TRUE)->setDisplayConfigurable('view', TRUE)->setDisplayOptions('form', [
+      'type' => 'options_select',
+      'settings' => [],
+      'weight' => -3
+    ]);
+    return $fields;
+  }
+  elseif ($entity_type->id() === "commerce_product") {
+    
+    $fields[DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD] = BaseFieldDefinition::create('string')->setLabel(t(' Domain Access (identifiant du domaine) '))->setRequired(TRUE)->setDisplayConfigurable('form', TRUE)->setDisplayConfigurable('view', TRUE)->setDisplayOptions('form', [
+      'type' => 'text_textfield'
+    ])->setReadOnly(TRUE);
+    
+    return $fields;
+  }
+  // debugLog::$max_depth = 1;
+  // debugLog::kintDebugDrupal($entity_type, $entity_type->id(), true);
+  return $fields;
 }
 
 /**
@@ -73,15 +60,18 @@ function wbumenudomain_entity_base_field_info(EntityTypeInterface $entity_type)
  * @param FormStateInterface $form_state
  * @param string $form_id
  */
-function wbumenudomain_form_commerce_product_form_alter(&$form, FormStateInterface $form_state, $form_id)
-{
-    if (! empty($form['field_domain_access'])) {
-        $domain = WbumenudomainMenuItemDecorating::getCurrentActiveDomaineByUrl();
-        $form['field_domain_access']['widget'][0]['value']['#default_value'] = $domain;
-        if (! in_array('administrator', \Drupal::currentUser()->getRoles()))
-            $form['field_domain_access']['widget'][0]['value']['#access'] = false;
-        $form['field_domain_access']['widget'][0]['value']['#attributes']['readonly'] = 'readonly';
+function wbumenudomain_form_commerce_product_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (!empty($form['field_domain_access'])) {
+    if (empty($form['field_domain_access']['widget'][0]['value']['#default_value'])) {
+      $domain = WbumenudomainMenuItemDecorating::getCurrentActiveDomaineByUrl();
+      $form['field_domain_access']['widget'][0]['value']['#default_value'] = $domain;
     }
+    
+    if (!in_array('administrator', \Drupal::currentUser()->getRoles())) {
+      $form['field_domain_access']['widget'][0]['value']['#access'] = false;
+      $form['field_domain_access']['widget'][0]['value']['#attributes']['readonly'] = 'readonly';
+    }
+  }
 }
 
 /**
@@ -90,15 +80,14 @@ function wbumenudomain_form_commerce_product_form_alter(&$form, FormStateInterfa
  * @param int $suggestions
  * @param int $variables
  */
-function wbumenudomain_theme_suggestions_page_alter(array &$suggestions, array $variables)
-{
-    // if (str_contains(\Drupal::routeMatch()->getRouteName(), "wbumenudomain."))
-    // {
-    // $suggestions[] = 'page__wbumenudomain';
-    // }
-    if (str_contains(\Drupal::routeMatch()->getRouteName(), "view.page_menu_principal")) {
-        $suggestions[] = 'page__wbumenudomain';
-    }
+function wbumenudomain_theme_suggestions_page_alter(array &$suggestions, array $variables) {
+  // if (str_contains(\Drupal::routeMatch()->getRouteName(), "wbumenudomain."))
+  // {
+  // $suggestions[] = 'page__wbumenudomain';
+  // }
+  if (str_contains(\Drupal::routeMatch()->getRouteName(), "view.page_menu_principal")) {
+    $suggestions[] = 'page__wbumenudomain';
+  }
 }
 
 /**
@@ -108,113 +97,110 @@ function wbumenudomain_theme_suggestions_page_alter(array &$suggestions, array $
  * @param \Drupal\Core\Form\FormStateInterface $form_state
  * @param string $form_id
  */
-function wbumenudomain_form_wbumenudomain_form_alter(&$form, FormStateInterface $form_state, $form_id)
-{
-    // dump($form_state->getValues());
-    // dump($form['hostname']['widget'][0]['value']);
-    if (! empty($form['hostname']['widget'][0]['value'])) {
-        $form['hostname']['widget'][0]['value']['#ajax'] = [
-            'callback' => '_wbumenudomain_siteconfig_alter',
-            'event' => 'change',
-            'wrapper' => 'wbumenudomain-siteconfig',
-            'progress' => [
-                'type' => 'throbber',
-                'message' => t('Mise à jour des données ...')
-            ],
-            'disable-refocus' => FALSE
-        ];
-    }
-    // dump($form['hostname']['widget'][0]['value']);
+function wbumenudomain_form_wbumenudomain_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // dump($form_state->getValues());
+  // dump($form['hostname']['widget'][0]['value']);
+  if (!empty($form['hostname']['widget'][0]['value'])) {
+    $form['hostname']['widget'][0]['value']['#ajax'] = [
+      'callback' => '_wbumenudomain_siteconfig_alter',
+      'event' => 'change',
+      'wrapper' => 'wbumenudomain-siteconfig',
+      'progress' => [
+        'type' => 'throbber',
+        'message' => t('Mise à jour des données ...')
+      ],
+      'disable-refocus' => FALSE
+    ];
+  }
+  // dump($form['hostname']['widget'][0]['value']);
 }
 
-function _wbumenudomain_siteconfig_alter($form, FormStateInterface $form_state)
-{
-    // $form_state->setUserInput([]);
-    // return $form;
-    // debugLog::$max_depth = 10;
-    // debugLog::kintDebugDrupal($form_state->getValues(),
-    // '_wbumenudomain_siteconfig_getValues');
-
-    // name
-    // $form['field_site_information']['widget'][0]['siteconf']['container']['name']["#value"]
-    // =
-    // $form['field_site_information']['widget'][0]['siteconf']['container']['name']["#default_value"];
-    //
-    // debugLog::kintDebugDrupal($form['field_site_information']['widget'][0]['siteconf']['container']['name'],
-    // '_wbumenudomain_siteconfig_alter');
-    // dump($form_state->getValue('field_site_information'));
-    return $form['field_site_information']['widget'][0]['siteconf']['container'];
+function _wbumenudomain_siteconfig_alter($form, FormStateInterface $form_state) {
+  // $form_state->setUserInput([]);
+  // return $form;
+  // debugLog::$max_depth = 10;
+  // debugLog::kintDebugDrupal($form_state->getValues(),
+  // '_wbumenudomain_siteconfig_getValues');
+  
+  // name
+  // $form['field_site_information']['widget'][0]['siteconf']['container']['name']["#value"]
+  // =
+  // $form['field_site_information']['widget'][0]['siteconf']['container']['name']["#default_value"];
+  //
+  // debugLog::kintDebugDrupal($form['field_site_information']['widget'][0]['siteconf']['container']['name'],
+  // '_wbumenudomain_siteconfig_alter');
+  // dump($form_state->getValue('field_site_information'));
+  return $form['field_site_information']['widget'][0]['siteconf']['container'];
 }
 
 /**
  * Implements hook_views_data_alter().
  */
-function wbumenudomain_views_data_alter(array &$data)
-{
-    // debugLog::$max_depth = 7;
-    // debugLog::kintDebugDrupal($data['block_content_field_data'],
-    // 'wbumenudomain_views_data_alter' . rand(10, 999));
-    /**
-     * --
-     */
-    // $data['block_content_field_data'][DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD]['field']['id']
-    // = 'domain_access_field';
-    // $data['block_content_field_data'][DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD
-    // . '_target_id']['filter']['id'] = 'domain_access_filter';
-    // $data['block_content_field_data'][DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD
-    // . '_target_id']['argument']['id'] = 'domain_access_argument';
-    // // Current domain filter.
-    $data['block_content_field_data']['current_domaine'] = [
-        'title' => t('Current domain'),
-        'group' => t('Domain'),
-        'filter' => [
-            'field' => DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD,
-            'id' => 'wbumenudomain_current_all_filter',
-            'title' => t('Available on current domain (2)'),
-            'help' => t('Filters out nodes available on current domain (published to current domain or all affiliates).')
-        ]
+function wbumenudomain_views_data_alter(array &$data) {
+  // debugLog::$max_depth = 7;
+  // debugLog::kintDebugDrupal($data['block_content_field_data'],
+  // 'wbumenudomain_views_data_alter' . rand(10, 999));
+  /**
+   * --
+   */
+  // $data['block_content_field_data'][DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD]['field']['id']
+  // = 'domain_access_field';
+  // $data['block_content_field_data'][DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD
+  // . '_target_id']['filter']['id'] = 'domain_access_filter';
+  // $data['block_content_field_data'][DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD
+  // . '_target_id']['argument']['id'] = 'domain_access_argument';
+  // // Current domain filter.
+  $data['block_content_field_data']['current_domaine'] = [
+    'title' => t('Current domain'),
+    'group' => t('Domain'),
+    'filter' => [
+      'field' => DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD,
+      'id' => 'wbumenudomain_current_all_filter',
+      'title' => t('Available on current domain (2)'),
+      'help' => t('Filters out nodes available on current domain (published to current domain or all affiliates).')
+    ]
+  ];
+  
+  /**
+   * Code example .
+   * Cet block de code permet d'alterer la condition where des requetes mysql.
+   * Ce block de code permet d'etendre la clause where de la table
+   * node_field_data. on identifier notre filtre avec la clée node_type_filter,
+   * puis on ajoute un filtre "filter".
+   * Deux elements sont important :
+   * - field => correspond à la colonne
+   * - id => cest l'id du plugin à utilise. ( la liste des plugin est disponible
+   * ici :
+   * https://api.drupal.org/api/drupal/core!modules!views!src!Plugin!views!filter!FilterPluginBase.php/group/views_filter_handlers/8.2.x)
+   */
+  // $data['node_field_data']['node_type_filter'] = array(
+  // 'title' => t('Enhanced node type filter'),
+  // 'filter' => array(
+  // 'title' => t('Enhanced node type filter'),
+  // 'help' => t('Provides a custom filter for nodes by their type.'),
+  // 'field' => 'type',
+  // 'id' => 'string'
+  // )
+  // );
+  
+  /**
+   * Ajout du filtre de domain pour les produits.
+   * on identifie notre filtre avec 'product_field_domain_access'.
+   * la colonne est definie : 'field'
+   * la requete est cree par 'id'
+   */
+  if (!empty($data['commerce_product_field_data'])) {
+    $data['commerce_product_field_data']['product_field_domain_access'] = [
+      'title' => t('Current domain'),
+      'group' => t('Domain'),
+      'filter' => [
+        'field' => DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD,
+        'id' => 'wbumenudomain_current_domain_product',
+        'title' => t('Available on current domain product'),
+        'help' => t('Filters out nodes available on current domain (published to current domain or all affiliates).')
+      ]
     ];
-
-    /**
-     * Code example .
-     * Cet block de code permet d'alterer la condition where des requetes mysql.
-     * Ce block de code permet d'etendre la clause where de la table
-     * node_field_data. on identifier notre filtre avec la clée node_type_filter,
-     * puis on ajoute un filtre "filter".
-     * Deux elements sont important :
-     * - field => correspond à la colonne
-     * - id => cest l'id du plugin à utilise. ( la liste des plugin est disponible
-     * ici :
-     * https://api.drupal.org/api/drupal/core!modules!views!src!Plugin!views!filter!FilterPluginBase.php/group/views_filter_handlers/8.2.x)
-     */
-    // $data['node_field_data']['node_type_filter'] = array(
-    // 'title' => t('Enhanced node type filter'),
-    // 'filter' => array(
-    // 'title' => t('Enhanced node type filter'),
-    // 'help' => t('Provides a custom filter for nodes by their type.'),
-    // 'field' => 'type',
-    // 'id' => 'string'
-    // )
-    // );
-
-    /**
-     * Ajout du filtre de domain pour les produits.
-     * on identifie notre filtre avec 'product_field_domain_access'.
-     * la colonne est definie : 'field'
-     * la requete est cree par 'id'
-     */
-    if (! empty($data['commerce_product_field_data'])) {
-        $data['commerce_product_field_data']['product_field_domain_access'] = [
-            'title' => t('Current domain'),
-            'group' => t('Domain'),
-            'filter' => [
-                'field' => DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD,
-                'id' => 'wbumenudomain_current_domain_product',
-                'title' => t('Available on current domain product'),
-                'help' => t('Filters out nodes available on current domain (published to current domain or all affiliates).')
-            ]
-        ];
-    }
+  }
 }
 
 /**
@@ -228,12 +214,11 @@ function wbumenudomain_views_data_alter(array &$data)
  * @param \Drupal\Core\Session\AccountInterface $account
  * @return boolean
  */
-function wbumenudomain_entity_access(\Drupal\Core\Entity\EntityInterface $entity, $operation, \Drupal\Core\Session\AccountInterface $account)
-{
-    if ("menu_link_content" === $entity->getEntityTypeId()) {
-        if ($operation == "view")
-            return AccessResult::allowed();
-    }
+function wbumenudomain_entity_access(\Drupal\Core\Entity\EntityInterface $entity, $operation, \Drupal\Core\Session\AccountInterface $account) {
+  if ("menu_link_content" === $entity->getEntityTypeId()) {
+    if ($operation == "view")
+      return AccessResult::allowed();
+  }
 }
 
 /**
@@ -243,24 +228,24 @@ function wbumenudomain_entity_access(\Drupal\Core\Entity\EntityInterface $entity
  * @param string $operation
  * @param \Drupal\Core\Session\AccountInterface $account
  */
-function wbumenudomain_commerce_product_access(\Drupal\commerce_product\Entity\Product $product, $operation, \Drupal\Core\Session\AccountInterface $account)
-{
-    if (in_array('administrator', $account->getRoles())) {
-        return AccessResult::allowed();
+function wbumenudomain_commerce_product_access(\Drupal\commerce_product\Entity\Product $product, $operation, \Drupal\Core\Session\AccountInterface $account) {
+  if (in_array('administrator', $account->getRoles())) {
+    return AccessResult::allowed();
+  }
+  if ($operation === 'add') {
+    return AccessResult::allowed();
+  }
+  else {
+    $domain = $product->get(DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD)->getValue();
+    if (!empty($domain)) {
+      $domainProduct = reset($domain);
+      $condition = $domainProduct['value'] == WbumenudomainMenuItemDecorating::getCurrentActiveDomaineByUrl() ? true : false;
     }
-    if ($operation === 'add') {
-        return AccessResult::allowed();
-    } else {
-        $domain = $product->get(DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD)->getValue();
-        if (! empty($domain)) {
-            $domainProduct = reset($domain);
-            $condition = $domainProduct['value'] == WbumenudomainMenuItemDecorating::getCurrentActiveDomaineByUrl() ? true : false;
-        }
-        if (empty($condition))
-            return AccessResult::forbidden(" Ce produit n'existe plus ou a été desactivé par ladministrateur.");
-        else
-            return AccessResult::allowed();
-    }
+    if (empty($condition))
+      return AccessResult::forbidden(" Ce produit n'existe plus ou a été desactivé par ladministrateur.");
+    else
+      return AccessResult::allowed();
+  }
 }
 
 
