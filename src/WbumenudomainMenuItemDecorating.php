@@ -109,7 +109,8 @@ class WbumenudomainMenuItemDecorating extends DefaultMenuLinkTreeManipulators {
       \Drupal::messenger()->addWarning("Ce domaine n'est pas encore enregitré");
     return $domain;
     // dump($domain);
-    // pourquoi cette zone ?
+    // pourquoi cette zone ? car on avait besoin de differencier les sous
+    // domaine, pour pouvoir effectuer les tests.
     // $new_value = strtolower($_SERVER['HTTP_HOST']);
     // $new_value = preg_replace('/[^a-z0-9_]+/', '_', $new_value);
     // return preg_replace('/_+/', '_', $new_value);
