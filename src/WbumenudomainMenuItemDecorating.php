@@ -98,6 +98,11 @@ class WbumenudomainMenuItemDecorating extends DefaultMenuLinkTreeManipulators {
     }
   }
   
+  /**
+   * Return l'id du domaine actif;
+   *
+   * @return string
+   */
   static public function getCurrentActiveDomaineByUrl() {
     /**
      *

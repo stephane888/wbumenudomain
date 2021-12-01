@@ -19,11 +19,11 @@ class Wbumenudomain {
     /* @var \Drupal\Core\Theme\ActiveTheme $theme */
     $theme = $themeInitialization->initTheme($theme_name);
     return [
-      'lesroisdelareno/prestataires_m0' => 'lesroisdelareno/prestataires_m0',
-      'lesroisdelareno/prestataires_m1' => 'lesroisdelareno/prestataires_m1',
-      'lesroisdelareno/prestataires_m2' => 'lesroisdelareno/prestataires_m2',
-      'lesroisdelareno/prestataires_m3' => 'lesroisdelareno/prestataires_m3',
-      'lesroisdelareno/prestataires_m4' => 'lesroisdelareno/prestataires_m4'
+      'lesroisdelareno/prestataires_m0' => 'Theme les rois de la reno',
+      'lesroisdelareno/prestataires_m1' => 'Theme Gabi',
+      'lesroisdelareno/prestataires_m2' => 'Theme Bigger',
+      'lesroisdelareno/prestataires_m3' => 'Theme Extra',
+      'lesroisdelareno/prestataires_m4' => 'Theme Farade'
     ];
   }
 
