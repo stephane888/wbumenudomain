@@ -98,8 +98,6 @@ function wbumenudomain_theme_suggestions_page_alter(array &$suggestions, array $
  * @param string $form_id
  */
 function wbumenudomain_form_wbumenudomain_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  // dump($form_state->getValues());
-  // dump($form['hostname']['widget'][0]['value']);
   if (!empty($form['hostname']['widget'][0]['value'])) {
     $form['hostname']['widget'][0]['value']['#ajax'] = [
       'callback' => '_wbumenudomain_siteconfig_alter',
@@ -112,7 +110,17 @@ function wbumenudomain_form_wbumenudomain_form_alter(&$form, FormStateInterface 
       'disable-refocus' => FALSE
     ];
   }
-  // dump($form['hostname']['widget'][0]['value']);
+}
+
+/**
+ * implement hook_form_FORM_ID_alter
+ *
+ * @param array $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param string $form_id
+ */
+function wbumenudomain_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $form["#attributes"]['class'][] = 'container';
 }
 
 function _wbumenudomain_siteconfig_alter($form, FormStateInterface $form_state) {
@@ -129,7 +137,6 @@ function _wbumenudomain_siteconfig_alter($form, FormStateInterface $form_state) 
   //
   // debugLog::kintDebugDrupal($form['field_site_information']['widget'][0]['siteconf']['container']['name'],
   // '_wbumenudomain_siteconfig_alter');
-  // dump($form_state->getValue('field_site_information'));
   return $form['field_site_information']['widget'][0]['siteconf']['container'];
 }
 

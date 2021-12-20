@@ -67,7 +67,7 @@ class WbumenudomainMenuItemDecorating extends DefaultMenuLinkTreeManipulators {
        */
       $link = $element->link;
       if ($link->getMenuName() == 'main') {
-        // dump($link->getOptions());
+        // 
       }
     }
     return $tree;
@@ -113,7 +113,7 @@ class WbumenudomainMenuItemDecorating extends DefaultMenuLinkTreeManipulators {
     if (empty($domain))
       \Drupal::messenger()->addWarning("Ce domaine n'est pas encore enregitré");
     return $domain;
-    // dump($domain);
+    
     // pourquoi cette zone ? car on avait besoin de differencier les sous
     // domaine, pour pouvoir effectuer les tests.
     // $new_value = strtolower($_SERVER['HTTP_HOST']);

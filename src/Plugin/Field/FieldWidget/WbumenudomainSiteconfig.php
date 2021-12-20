@@ -74,14 +74,14 @@ class WbumenudomainSiteconfig extends WidgetBase
      */
     public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state)
     {
-        // dump(\Drupal::routeMatch()->getParameters()->all()); //
+        
         $hostname = $form_state->getValue('hostname');
         if (! empty($hostname[0]['value'])) {
             $hostname = $hostname[0]['value'];
             //
             $this->ThemeUtility->ActiveUseAjax();
             // $form_state->setRebuild();
-            // dump($form_state->getValues());
+            
         }
         if (! $hostname) {
             /**
@@ -92,16 +92,7 @@ class WbumenudomainSiteconfig extends WidgetBase
                 $hostname = $wbumenudomain->getHostname();
             }
         }
-        // dump($this->WbumenudomainConf->getConfigs(), $this->WbumenudomainConf->getValue('domain.config.v2_presta_1_kksa.system.site'));
-        // $value = isset($items[$delta]->value) ? $items[$delta]->value : '';
-        // $element['value'] = $element + [
-        // '#type' => 'select',
-        // '#default_value' => $value,
-        // '#options' => [
-        // 't1' => 'T1'
-        // ]
-        // ];
-        //
+        
         $element['siteconf'] = [];
         $this->ThemeUtility->addContainerTree('container', $element['siteconf'], 'Configuration du site', true);
         $element['siteconf']['container']['#prefix'] = '<div id="wbumenudomain-siteconfig">';
@@ -117,11 +108,11 @@ class WbumenudomainSiteconfig extends WidgetBase
 
         if (! empty($hostname)) {
             $siteConf = $this->WbumenudomainConf->getValue('domain.config.' . $hostname . '.system.site');
-            // dump($hostname);
+            
             // die();
             $this->formSiteConfig($element['siteconf']['container'], $siteConf, 'domain.config.' . $hostname . '.system.site');
         }
-        // dump($form_state->getValues());
+        
         // die();
         // $form_state->setRebuild();
         return $element;
@@ -129,7 +120,6 @@ class WbumenudomainSiteconfig extends WidgetBase
 
     public function formSiteConfig(array &$form, array $siteConf = [], $id_config)
     {
-        // dump($siteConf);
         // edit config
         $this->ThemeUtility->addHiddenTree('edit-config', $form, $id_config);
         // name
@@ -154,7 +144,7 @@ class WbumenudomainSiteconfig extends WidgetBase
 
     public function validateElement(array $element, FormStateInterface $form_state)
     {
-        // dump($element, $form_state->getValues(), $form_state->getUserInput());
+       
         // die();
         $vals = $form_state->getUserInput();
         // name

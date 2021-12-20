@@ -49,9 +49,7 @@ class WbumenudomainCurrentDomainProduct extends BooleanOperator {
     $domain_negotiator = \Drupal::service('domain.negotiator');
     $current_domain = $domain_negotiator->getActiveDomain();
     $current_domain_id = $current_domain->id();
-    // dump($current_domain_id);
-    // dump($this->value);
-    // dump($this->realField);
+    
     // if (empty($this->value)) {
     // $where = "(($real_field <> '$current_domain_id' OR $real_field IS NULL)
     // AND ($all_field = 0 OR $all_field IS NULL))";

@@ -35,9 +35,9 @@ class WbumenudomainHost extends WidgetBase {
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    // dump($items);
+    
     // debugLog::kintDebugDrupal($items->getEntity(), 'getEntity');
-    // dump($items->getEntity()->getEntityTypeId());
+    
     $entityTypeId = $items->getEntity()->getEntityTypeId();
     $value = isset($items[$delta]->value) ? $items[$delta]->value : '';
     $element['value'] = $element + [

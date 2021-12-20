@@ -39,7 +39,7 @@ class WbumenudomainEditMenu extends OptionsWidgetBase
     public static function validateElement(array $element, FormStateInterface $form_state)
     {
         parent::validateElement($element, $form_state);
-        // dump($element);
+        
         $items = [
             [
                 'value' => "hummm"
@@ -63,7 +63,7 @@ class WbumenudomainEditMenu extends OptionsWidgetBase
         ]);
         $key_exists = NULL;
         $values = NestedArray::getValue($form_state->getValues(), $path, $key_exists);
-        // dump('val', $values);
+        
         // die();
         // Assign the values and remove the empty ones.
         $items->setValue($values);

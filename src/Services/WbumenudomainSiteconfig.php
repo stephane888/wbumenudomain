@@ -44,7 +44,7 @@ class WbumenudomainSiteconfig
 
     public function SaveValue($key, $value)
     {
-        // dump($key, $value);
+        
         if ($this->idConfig) {
             $conf = $this->ConfigFactory->getEditable($this->idConfig);
             $conf->set($key, $value)->save();

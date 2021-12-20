@@ -1,11 +1,12 @@
 <?php
+
 namespace Drupal\wbumenudomain;
 
 use Drupal\domain\Entity\Domain;
 use Drupal\wbumenudomain\Entity\Wbumenudomain as WbumenudomainEntity;
 
 class Wbumenudomain {
-
+  
   /**
    * -
    */
@@ -23,10 +24,13 @@ class Wbumenudomain {
       'lesroisdelareno/prestataires_m1' => 'Theme Gabi',
       'lesroisdelareno/prestataires_m2' => 'Theme Bigger',
       'lesroisdelareno/prestataires_m3' => 'Theme Extra',
-      'lesroisdelareno/prestataires_m4' => 'Theme Farade'
+      'lesroisdelareno/prestataires_m4' => 'Theme Farade',
+      'lesroisdelareno/prestataires_m6' => 'Theme Commerce',
+      'lesroisdelareno/prestataires_m5' => 'Theme partenaire',
+      'lesroisdelareno/prestataires_m7' => 'Theme architecte'
     ];
   }
-
+  
   /**
    * --
    */
@@ -41,7 +45,7 @@ class Wbumenudomain {
     }
     return $hostnames;
   }
-
+  
   /**
    * - Recupere la liste des domaine non utilisé.
    */
@@ -50,20 +54,21 @@ class Wbumenudomain {
     $UseDomain = self::getEntityWbumenudomain($entityTypeId);
     $UnUseDomaines = [];
     foreach ($domaines as $k => $domaine) {
-      if ($value == $k || ! isset($UseDomain[$k])) {
+      if ($value == $k || !isset($UseDomain[$k])) {
         $UnUseDomaines[$k] = $domaine;
       }
     }
     return $UnUseDomaines;
   }
-
+  
   /**
    * --
    */
   public static function getEntityWbumenudomain($entityTypeId = null) {
     if ($entityTypeId == 'node') {
       return [];
-    } else {
+    }
+    else {
       $query = \Drupal::entityQuery('wbumenudomain');
       $domainIds = $query->execute();
       $wbumenudomains = WbumenudomainEntity::loadMultiple($domainIds);
@@ -74,4 +79,5 @@ class Wbumenudomain {
       return $hostnames;
     }
   }
+  
 }
