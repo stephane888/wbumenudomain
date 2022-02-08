@@ -7,6 +7,7 @@ use Drupal\domain_access\DomainAccessManagerInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\wbumenudomain\WbumenudomainMenuItemDecorating;
 use Stephane888\Debug\debugLog;
+use Drupal\wbumenudomain\WbumenuDomainFormStep;
 
 /**
  * implement hook_entity_base_field_info
@@ -15,8 +16,7 @@ use Stephane888\Debug\debugLog;
  * @file
  * Primary module hooks for wbumenudomain module.
  *
- * @see https://www.drupal.org/docs/drupal-apis/entity-api/fieldtypes-fieldwidgets-and-fieldformatters
- *      to get all types BaseFieldDefinition;
+ * @see https://www.drupal.org/docs/drupal-apis/entity-api/fieldtypes-fieldwidgets-and-fieldformatters to get all types BaseFieldDefinition;
  *     
  * @DCG
  * This file is no longer required in Drupal 8.
@@ -37,14 +37,13 @@ function wbumenudomain_entity_base_field_info(EntityTypeInterface $entity_type) 
       'type' => 'options_select',
       'settings' => [],
       'weight' => -3
-    ]);
+    ])->setDefaultValueCallback('\Drupal\wbumenudomain\WbumenudomainMenuItemDecorating::getCurrentActiveDomaineByUrl');
     return $fields;
   }
   elseif ($entity_type->id() === "commerce_product") {
-    
     $fields[DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD] = BaseFieldDefinition::create('string')->setLabel(t(' Domain Access (identifiant du domaine) '))->setRequired(TRUE)->setDisplayConfigurable('form', TRUE)->setDisplayConfigurable('view', TRUE)->setDisplayOptions('form', [
       'type' => 'text_textfield'
-    ])->setReadOnly(TRUE);
+    ])->setReadOnly(TRUE)->setDefaultValueCallback('\Drupal\wbumenudomain\WbumenudomainMenuItemDecorating::getCurrentActiveDomaineByUrl');
     
     return $fields;
   }
@@ -64,7 +63,8 @@ function wbumenudomain_form_commerce_product_form_alter(&$form, FormStateInterfa
   if (!empty($form['field_domain_access'])) {
     if (empty($form['field_domain_access']['widget'][0]['value']['#default_value'])) {
       $domain = WbumenudomainMenuItemDecorating::getCurrentActiveDomaineByUrl();
-      $form['field_domain_access']['widget'][0]['value']['#default_value'] = $domain;
+      // $form['field_domain_access']['widget'][0]['value']['#default_value'] =
+      // $domain;
     }
     
     if (!in_array('administrator', \Drupal::currentUser()->getRoles())) {
@@ -81,6 +81,7 @@ function wbumenudomain_form_commerce_product_form_alter(&$form, FormStateInterfa
  * @param int $variables
  */
 function wbumenudomain_theme_suggestions_page_alter(array &$suggestions, array $variables) {
+  // dump(WbumenudomainMenuItemDecorating::getCurrentActiveDomaineByUrl());
   // if (str_contains(\Drupal::routeMatch()->getRouteName(), "wbumenudomain."))
   // {
   // $suggestions[] = 'page__wbumenudomain';
@@ -98,18 +99,31 @@ function wbumenudomain_theme_suggestions_page_alter(array &$suggestions, array $
  * @param string $form_id
  */
 function wbumenudomain_form_wbumenudomain_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  if (!empty($form['hostname']['widget'][0]['value'])) {
-    $form['hostname']['widget'][0]['value']['#ajax'] = [
-      'callback' => '_wbumenudomain_siteconfig_alter',
-      'event' => 'change',
-      'wrapper' => 'wbumenudomain-siteconfig',
-      'progress' => [
-        'type' => 'throbber',
-        'message' => t('Mise à jour des données ...')
-      ],
-      'disable-refocus' => FALSE
-    ];
-  }
+  $form["#attributes"]['class'][] = 'my-5';
+  // if (!empty($form['hostname']['widget'][0]['value'])) {
+  // $form['hostname']['widget'][0]['value']['#ajax'] = [
+  // 'callback' => '_wbumenudomain_siteconfig_alter',
+  // 'event' => 'change',
+  // 'wrapper' => 'wbumenudomain-siteconfig',
+  // 'progress' => [
+  // 'type' => 'throbber',
+  // 'message' => t('Mise à jour des données ...')
+  // ],
+  // 'disable-refocus' => FALSE
+  // ];
+  // }
+  // $multiStep = new WbumenuDomainFormStep($form, $form_state);
+  // $form = $multiStep->build();
+}
+
+function wbumenudomain__next_step(&$form, FormStateInterface $form_state) {
+  // dump('Validation wbumenudomain__next_step');
+}
+
+function wbumenudomain_form_multistep(&$form, FormStateInterface $form_state) {
+  // $form_state->set('page_num', 2)->setRebuild(TRUE);
+  // dump($form);
+  // die();
 }
 
 /**
@@ -121,6 +135,12 @@ function wbumenudomain_form_wbumenudomain_form_alter(&$form, FormStateInterface 
  */
 function wbumenudomain_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   $form["#attributes"]['class'][] = 'container';
+  $form["#attributes"]['class'][] = 'my-5';
+  // $multiStep = new WbumenuDomainFormStep($form, $form_state);
+  // $form = $multiStep->build();
+  // debugLog::$max_depth = 7;
+  // dump($form);
+  // debugLog::kintDebugDrupal($form, 'wbumenudomain_form_node_form_alter', true);
 }
 
 function _wbumenudomain_siteconfig_alter($form, FormStateInterface $form_state) {
@@ -254,6 +274,98 @@ function wbumenudomain_commerce_product_access(\Drupal\commerce_product\Entity\P
       return AccessResult::allowed();
   }
 }
+
+/**
+ * Perform alterations before the reference form is included in the IEF widget.
+ *
+ * The reference form is used to add existing entities through an autocomplete
+ * field
+ *
+ * @param array $reference_form
+ *        Nested array of form elements that comprise the reference form.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *        The form state of the parent form.
+ */
+function wbumenudomain_inline_entity_form_reference_form_alter(array &$reference_form, FormStateInterface &$form_state) {
+  debugLog::kintDebugDrupal($reference_form, 'wbumenudomain_inline_entity_form_reference_form_alter', true);
+}
+
+function wbumenudomain_inline_entity_form_entity_form_alter(array &$entity_form, FormStateInterface &$form_state) {
+  debugLog::kintDebugDrupal($entity_form, 'wbumenudomain_inline_entity_form_entity_form_alter', true);
+}
+
+function wbumenudomain_inline_entity_form_table_fields_alter(array &$fields, array $context) {
+  // debugLog::kintDebugDrupal($fields, 'wbumenudomain_inline_entity_form_table_fields_alter', true);
+  if ($context['entity_type'] == 'node') {
+    $fields['nid'] = [
+      'type' => 'field',
+      'label' => 'ID',
+      'weight' => 101
+    ];
+  }
+}
+
+function wbumenudomain_field_widget_inline_entity_form_complex_form_alter(&$element, \Drupal\Core\Form\FormStateInterface $form_state, $context) {
+  // $debug = [
+  // $element,
+  // $context
+  // ];
+  // debugLog::kintDebugDrupal($debug, 'wbumenudomain_field_widget_inline_entity_form_complex_form_alter', true);
+}
+
+function wbumenudomain_field_widget_wbumenudomainhost_complex_inline_form_alter(&$element, \Drupal\Core\Form\FormStateInterface $form_state, $context) {
+  debugLog::$max_depth = 5;
+  // debugLog::kintDebugDrupal($element['entities'], 'wbumenudomain_field_widget_wbumenudomainhost_complex_inline_form_alter', true);
+  //
+  //
+  
+  /**
+   *
+   * @var \Drupal\Core\Field\FieldItemListInterface $items
+   */
+  $items = $context['items'];
+  // On n'essaie de faire des copie de contenus.
+  if ($items->getEntity()->isNew()) {
+    foreach ($element['entities'] as $k => $value) {
+      if (!empty($value['#entity'])) {
+        /**
+         *
+         * @var \Drupal\node\Entity\Node $node
+         */
+        $node = $value['#entity'];
+        $element['entities'][$k]['#entity'] = $node->createDuplicate();
+        $element['entities'][$k]['#needs_save'] = true;
+      }
+    }
+  }
+  debugLog::kintDebugDrupal($element['entities'], 'wbumenudomain_field_widget_wbumenudomainhost_complex_inline_form_alter', true);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

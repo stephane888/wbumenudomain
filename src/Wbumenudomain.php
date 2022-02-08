@@ -27,7 +27,8 @@ class Wbumenudomain {
       'lesroisdelareno/prestataires_m4' => 'Theme Farade',
       'lesroisdelareno/prestataires_m6' => 'Theme Commerce',
       'lesroisdelareno/prestataires_m5' => 'Theme partenaire',
-      'lesroisdelareno/prestataires_m7' => 'Theme architecte'
+      'lesroisdelareno/prestataires_m7' => 'Theme architecte',
+      'lesroisdelareno/prestataires_m8' => 'Theme rc-web'
     ];
   }
   
@@ -47,11 +48,13 @@ class Wbumenudomain {
   }
   
   /**
-   * - Recupere la liste des domaine non utilisé.
+   * - Recupere la liste des domaines non utilisé.
    */
   public static function getUnUseDomain($value = null, $entityTypeId = null) {
     $domaines = self::getAlldomaines();
     $UseDomain = self::getEntityWbumenudomain($entityTypeId);
+    // dump($UseDomain);
+    // dump($domaines);
     $UnUseDomaines = [];
     foreach ($domaines as $k => $domaine) {
       if ($value == $k || !isset($UseDomain[$k])) {
@@ -69,7 +72,7 @@ class Wbumenudomain {
       return [];
     }
     else {
-      $query = \Drupal::entityQuery('wbumenudomain');
+      $query = \Drupal::entityQuery($entityTypeId);
       $domainIds = $query->execute();
       $wbumenudomains = WbumenudomainEntity::loadMultiple($domainIds);
       $hostnames = [];
@@ -78,6 +81,22 @@ class Wbumenudomain {
       }
       return $hostnames;
     }
+  }
+  
+  /**
+   * Cette function doit etre sur un autre module externe à ce dernier.
+   *
+   * @deprecated
+   * @return string|number|NULL
+   */
+  public static function getCurrentdomain() {
+    /** @var \Drupal\domain\Entity\Domain $active */
+    $active = \Drupal::service('domain.negotiator')->getActiveDomain();
+    if (empty($active)) {
+      $active = \Drupal::entityTypeManager()->getStorage('domain')->loadDefaultDomain();
+    }
+    if (!empty($active))
+      return $active->id();
   }
   
 }

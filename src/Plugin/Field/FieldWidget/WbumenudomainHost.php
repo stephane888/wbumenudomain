@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\wbumenudomain\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
@@ -19,7 +20,7 @@ use Stephane888\Debug\debugLog;
  * )
  */
 class WbumenudomainHost extends WidgetBase {
-
+  
   /**
    *
    * {@inheritdoc}
@@ -29,15 +30,12 @@ class WbumenudomainHost extends WidgetBase {
       'placeholder' => ''
     ] + parent::defaultSettings();
   }
-
+  
   /**
    *
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    
-    // debugLog::kintDebugDrupal($items->getEntity(), 'getEntity');
-    
     $entityTypeId = $items->getEntity()->getEntityTypeId();
     $value = isset($items[$delta]->value) ? $items[$delta]->value : '';
     $element['value'] = $element + [
@@ -49,7 +47,7 @@ class WbumenudomainHost extends WidgetBase {
     ];
     return $element;
   }
-
+  
   /**
    *
    * {@inheritdoc}
@@ -63,4 +61,5 @@ class WbumenudomainHost extends WidgetBase {
     ];
     return $element;
   }
+  
 }
