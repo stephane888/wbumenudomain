@@ -95,4 +95,8 @@ class WbumenudomainComplexInline extends InlineEntityFormComplex {
     return $settingsSummary;
   }
   
+  public function _getIefId() {
+    return $this->getIefId();
+  }
+  
 }

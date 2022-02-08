@@ -8,6 +8,7 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\wbumenudomain\WbumenudomainMenuItemDecorating;
 use Stephane888\Debug\debugLog;
 use Drupal\wbumenudomain\WbumenuDomainFormStep;
+use Drupal\Component\Utility\NestedArray;
 
 /**
  * implement hook_entity_base_field_info
@@ -290,14 +291,27 @@ function wbumenudomain_inline_entity_form_reference_form_alter(array &$reference
   debugLog::kintDebugDrupal($reference_form, 'wbumenudomain_inline_entity_form_reference_form_alter', true);
 }
 
+/**
+ * S'execute lors de la MAJ d'un elment dans inline_form_entite.
+ *
+ * @param array $entity_form
+ * @param FormStateInterface $form_state
+ */
 function wbumenudomain_inline_entity_form_entity_form_alter(array &$entity_form, FormStateInterface &$form_state) {
-  debugLog::kintDebugDrupal($entity_form, 'wbumenudomain_inline_entity_form_entity_form_alter', true);
+  // debugLog::kintDebugDrupal($entity_form, 'wbumenudomain_inline_entity_form_entity_form_alter', true);
 }
 
 function wbumenudomain_inline_entity_form_table_fields_alter(array &$fields, array $context) {
   // debugLog::kintDebugDrupal($fields, 'wbumenudomain_inline_entity_form_table_fields_alter', true);
   if ($context['entity_type'] == 'node') {
     $fields['nid'] = [
+      'type' => 'field',
+      'label' => 'ID',
+      'weight' => 101
+    ];
+  }
+  elseif ($context['entity_type'] == 'block_content') {
+    $fields['id'] = [
       'type' => 'field',
       'label' => 'ID',
       'weight' => 101
@@ -314,31 +328,73 @@ function wbumenudomain_field_widget_inline_entity_form_complex_form_alter(&$elem
 }
 
 function wbumenudomain_field_widget_wbumenudomainhost_complex_inline_form_alter(&$element, \Drupal\Core\Form\FormStateInterface $form_state, $context) {
-  debugLog::$max_depth = 5;
-  // debugLog::kintDebugDrupal($element['entities'], 'wbumenudomain_field_widget_wbumenudomainhost_complex_inline_form_alter', true);
-  //
-  //
+  // debugLog::$max_depth = 5;
+  // debugLog::kintDebugDrupal($element, 'wbumenudomain_field_widget_wbumenudomainhost_complex_inline_form_alter', true);
   
   /**
    *
    * @var \Drupal\Core\Field\FieldItemListInterface $items
    */
   $items = $context['items'];
+  
+  // debugLog::kintDebugDrupal($entities, 'wbumenudomain_field_widget_wbumenudomainhost_complex_inline_form_alter', true);
   // On n'essaie de faire des copie de contenus.
   if ($items->getEntity()->isNew()) {
-    foreach ($element['entities'] as $k => $value) {
-      if (!empty($value['#entity'])) {
-        /**
-         *
-         * @var \Drupal\node\Entity\Node $node
-         */
-        $node = $value['#entity'];
-        $element['entities'][$k]['#entity'] = $node->createDuplicate();
-        $element['entities'][$k]['#needs_save'] = true;
+    /**
+     *
+     * @var \Drupal\wbumenudomain\Plugin\Field\FieldWidget\WbumenudomainComplexInline $widget
+     */
+    $widget = $context['widget'];
+    $ief_id = $widget->_getIefId();
+    $entities = $form_state->get([
+      'inline_entity_form',
+      $ief_id,
+      'entities'
+    ]);
+    
+    // uniquement lors de la creation d'un contenu, on duplique les contenus definies par defaut.
+    if (!$form_state->get('default_value_widget')) {
+      
+      if (!empty($entities)) {
+        // on met à jour les données present dans $form_state.
+        foreach ($entities as $k => $entity) {
+          /**
+           *
+           * @var \Drupal\node\Entity\Node $entity
+           */
+          $cloneNode = $entity['entity']->createDuplicate();
+          $entities[$k]['needs_save'] = true;
+          $entities[$k]['form'] = null;
+          $entities[$k]['entity'] = $cloneNode;
+        }
+        //
+        $form_state->set([
+          'inline_entity_form',
+          $ief_id,
+          'entities'
+        ], $entities);
+        // On met à jour les données present dans le bloc d'affichage.
+        foreach ($element['entities'] as $k => $entity) {
+          if (!empty($entity['#entity'])) {
+            /**
+             *
+             * @var \Drupal\node\Entity\Node $node
+             */
+            $node = $element['entities'][$k]['#entity'];
+            $element['entities'][$k]['#entity'] = $node->createDuplicate();
+            $element['entities'][$k]['#needs_save'] = true;
+          }
+        }
+      }
+      else {
+        $message = "Aucun contenu par defaut pour le champs : " . $items->getName();
+        \Drupal::messenger()->addStatus($message);
       }
     }
+    // debugLog::kintDebugDrupal($element['entities'][0], 'wbumenudomain_field_widget_wbumenudomainhost_complex_inline_form_alter', true);
+    // $form_values = NestedArray::getValue($form_state->getValues(), $reference_form['#parents']);
+    // debugLog::kintDebugDrupal($element['entities'][0], 'wbumenudomain_field_widget_wbumenudomainhost_complex_inline_form_alter', true);
   }
-  debugLog::kintDebugDrupal($element['entities'], 'wbumenudomain_field_widget_wbumenudomainhost_complex_inline_form_alter', true);
 }
 
 
