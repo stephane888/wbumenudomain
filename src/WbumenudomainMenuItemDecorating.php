@@ -67,7 +67,7 @@ class WbumenudomainMenuItemDecorating extends DefaultMenuLinkTreeManipulators {
        */
       $link = $element->link;
       if ($link->getMenuName() == 'main') {
-        // 
+        //
       }
     }
     return $tree;
@@ -80,21 +80,24 @@ class WbumenudomainMenuItemDecorating extends DefaultMenuLinkTreeManipulators {
     $query = \Drupal::entityQuery('wbumenudomain');
     $query->condition('hostname', $this->CurrentHostName);
     $ids = $query->execute();
-    $Wbumenudomain = Wbumenudomain::loadMultiple($ids);
-    if (!empty($Wbumenudomain)) {
-      /**
-       *
-       * @var \Drupal\wbumenudomain\Entity\Wbumenudomain $Wbumenudomain
-       */
-      $Wbumenudomain = reset($Wbumenudomain);
-      $this->Wbumenudomain = $Wbumenudomain->get('field_element_de_menu_valides')->getValue();
-      if (!empty($this->Wbumenudomain)) {
-        $this->Wbumenudomain = reset($this->Wbumenudomain);
-        $this->Wbumenudomain = Json::decode($this->Wbumenudomain['value']);
+    if (!empty($ids)) {
+      $Wbumenudomain = Wbumenudomain::loadMultiple($ids);
+      if (!empty($Wbumenudomain)) {
+        
+        /**
+         *
+         * @var \Drupal\wbumenudomain\Entity\Wbumenudomain $Wbumenudomain
+         */
+        $Wbumenudomain = reset($Wbumenudomain);
+        $this->Wbumenudomain = $Wbumenudomain->get('field_element_de_menu_valides')->getValue();
+        if (!empty($this->Wbumenudomain)) {
+          $this->Wbumenudomain = reset($this->Wbumenudomain);
+          $this->Wbumenudomain = Json::decode($this->Wbumenudomain['value']);
+        }
       }
-    }
-    else {
-      \Drupal::messenger()->addWarning("Ce domaine n'est pas encore configurée");
+      else {
+        \Drupal::messenger()->addWarning("Ce domaine n'est pas encore configurée");
+      }
     }
   }
   

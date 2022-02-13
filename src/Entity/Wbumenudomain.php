@@ -132,7 +132,21 @@ class Wbumenudomain extends ContentEntityBase implements ContentEntityInterface 
   }
   
   /**
-   * liste de champs valid Drupal\Core\TypedData\TypedDataManager or
+   * Permet de recuperer le model de page d'accueil.
+   *
+   * @return mixed
+   */
+  public function getContentTypeHomePage() {
+    $h = $this->get('lirairy')->getValue();
+    //
+    if (!empty($h)) {
+      return WbumenudomainUtility::getContentTypeHomePage($h[0]['value']);
+    }
+    return $h;
+  }
+  
+  /**
+   * Liste de champs valid Drupal\Core\TypedData\TypedDataManager or
    * /admin/config/system/helpdevel/services/typed_data_manager
    *
    * {@inheritdoc} Define the field properties here.
@@ -196,7 +210,10 @@ class Wbumenudomain extends ContentEntityBase implements ContentEntityInterface 
     // 'UniqueField' => []
     // ]);
     // Librairy utiliser par le theme.
-    $fields['lirairy'] = BaseFieldDefinition::create('list_string')->setLabel(t(' Selectionné un style pour ce domaine '))->setRequired(TRUE)->setDescription(t('Selectionner le nom de domaine'))->setSetting('allowed_values_function', [
+    /**
+     * --
+     */
+    $fields['lirairy'] = BaseFieldDefinition::create('list_string')->setLabel(t(" Selectionner un model de page d'accueil "))->setRequired(TRUE)->setDescription(t(" NB : l'id de la page d'accueil serra retouné en fin de procccessus "))->setSetting('allowed_values_function', [
       '\Drupal\wbumenudomain\Wbumenudomain',
       'getLibrairiesCurrentTheme'
     ])->setDisplayOptions('view', [

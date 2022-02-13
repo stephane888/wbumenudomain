@@ -11,14 +11,6 @@ class Wbumenudomain {
    * -
    */
   public static function getLibrairiesCurrentTheme() {
-    /**
-     *
-     * @var \Drupal\Core\Theme\ThemeInitialization $themeInitialization
-     */
-    $theme_name = \Drupal::config('system.theme')->get('default');
-    $themeInitialization = \Drupal::service("theme.initialization");
-    /* @var \Drupal\Core\Theme\ActiveTheme $theme */
-    $theme = $themeInitialization->initTheme($theme_name);
     return [
       'lesroisdelareno/prestataires_m0' => 'Theme les rois de la reno',
       'lesroisdelareno/prestataires_m1' => 'Theme Gabi',
@@ -30,6 +22,26 @@ class Wbumenudomain {
       'lesroisdelareno/prestataires_m7' => 'Theme architecte',
       'lesroisdelareno/prestataires_m8' => 'Theme rc-web'
     ];
+  }
+  
+  /**
+   * --
+   */
+  public static function getContentTypeHomePage(string $key) {
+    $types = [
+      'lesroisdelareno/prestataires_m0' => 'model_page_d_accueil',
+      'lesroisdelareno/prestataires_m1' => 'model_d_affichage_theme_gabi_',
+      'lesroisdelareno/prestataires_m2' => 'model_d_affichage_theme_bigger_',
+      'lesroisdelareno/prestataires_m3' => 'theme_extra',
+      'lesroisdelareno/prestataires_m4' => 'model_d_affichage_theme_farade_',
+      'lesroisdelareno/prestataires_m6' => 'model_d_affichage_theme_commerce',
+      'lesroisdelareno/prestataires_m5' => 'model_d_affichage_theme_partenai',
+      'lesroisdelareno/prestataires_m7' => 'model_d_affichage_architecte_',
+      'lesroisdelareno/prestataires_m8' => 'model_d_affichage_rc_webr_'
+    ];
+    if (!empty($types[$key])) {
+      return $types[$key];
+    }
   }
   
   /**
@@ -74,10 +86,13 @@ class Wbumenudomain {
     else {
       $query = \Drupal::entityQuery($entityTypeId);
       $domainIds = $query->execute();
-      $wbumenudomains = WbumenudomainEntity::loadMultiple($domainIds);
+      $entityType = \Drupal::entityTypeManager()->getStorage($entityTypeId);
       $hostnames = [];
-      foreach ($wbumenudomains as $wbumenudomain) {
-        $hostnames[$wbumenudomain->getHostname()] = $wbumenudomain->getHostname();
+      if ($entityType) {
+        $wbumenudomains = $entityType->loadMultiple($domainIds);
+        foreach ($wbumenudomains as $wbumenudomain) {
+          $hostnames[$wbumenudomain->getHostname()] = $wbumenudomain->getHostname();
+        }
       }
       return $hostnames;
     }

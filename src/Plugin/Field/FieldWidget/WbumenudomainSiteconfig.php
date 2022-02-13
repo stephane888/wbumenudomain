@@ -101,8 +101,8 @@ class WbumenudomainSiteconfig extends WidgetBase {
     // static::class,
     // 'ConfigSaveSubmit__'
     // ];
-    
-    if (!empty($hostname)) {
+    $request = \Drupal::request();
+    if (!empty($hostname) || $request->query->has('content-type-home-id')) {
       $siteConf = $this->WbumenudomainConf->getValue('domain.config.' . $hostname . '.system.site');
       // die();
       $this->formSiteConfig($element['siteconf']['container'], $siteConf, 'domain.config.' . $hostname . '.system.site');
