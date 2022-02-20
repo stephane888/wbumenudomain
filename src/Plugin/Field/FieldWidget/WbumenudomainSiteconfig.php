@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\wbumenudomain\Services\WbumenudomainSiteconfig as WbumenudomainConf;
 use Stephane888\HtmlBootstrap\ThemeUtility;
+use Stephane888\Debug\debugLog;
 
 /**
  *
@@ -70,15 +71,14 @@ class WbumenudomainSiteconfig extends WidgetBase {
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
+    // on recupere le domaine-id à partir du champs.
     $hostname = $form_state->getValue('hostname');
-    // dump($hostname);
     if (!empty($hostname[0]['value'])) {
       $hostname = $hostname[0]['value'];
-      //
       $this->ThemeUtility->ActiveUseAjax();
-      // $form_state->setRebuild();
     }
-    if (!$hostname) {
+    // Si non, on recupere à partir de l'entité.( pour l'edition).
+    elseif (!$hostname) {
       // dump(\Drupal::routeMatch()->getParameters());
       /**
        *
@@ -86,6 +86,13 @@ class WbumenudomainSiteconfig extends WidgetBase {
        */
       if ($config_theme_entity = \Drupal::routeMatch()->getParameter('config_theme_entity')) {
         $hostname = $config_theme_entity->getHostname();
+      }
+    }
+    // Si non, on recupere à partir de l'url.
+    else {
+      $request = \Drupal::request();
+      if ($request->query->has('domaine-id')) {
+        $hostname = $request->query->get('domaine-id');
       }
     }
     
@@ -101,8 +108,8 @@ class WbumenudomainSiteconfig extends WidgetBase {
     // static::class,
     // 'ConfigSaveSubmit__'
     // ];
-    $request = \Drupal::request();
-    if (!empty($hostname) || $request->query->has('content-type-home-id')) {
+    
+    if (!empty($hostname)) {
       $siteConf = $this->WbumenudomainConf->getValue('domain.config.' . $hostname . '.system.site');
       // die();
       $this->formSiteConfig($element['siteconf']['container'], $siteConf, 'domain.config.' . $hostname . '.system.site');
@@ -137,9 +144,15 @@ class WbumenudomainSiteconfig extends WidgetBase {
   }
   
   public function validateElement(array $element, FormStateInterface $form_state) {
-    
     // die();
     $vals = $form_state->getUserInput();
+    $data = [
+      $vals['site_config'],
+      $form_state->getValue('site_config'),
+      $vals['site_config']
+    ];
+    debugLog::$max_depth = 6;
+    debugLog::kintDebugDrupal($data, 'validateElement', true);
     
     // name
     if (!empty($vals['site_config'][0]['siteconf']['container'])) {

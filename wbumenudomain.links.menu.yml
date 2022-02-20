@@ -11,4 +11,4 @@ wbumenudomain.admin.structure.settings:
   title: 'Wbumenudomain Settings'
   description: 'Configure Wbumenudomain entity'
   route_name:  wbumenudomain.wbumenudomain_settings
-  parent: system.admin_structure
+  parent: entity.wbumenudomain.collection

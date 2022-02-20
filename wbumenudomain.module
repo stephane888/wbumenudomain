@@ -82,7 +82,7 @@ function wbumenudomain_form_commerce_product_form_alter(&$form, FormStateInterfa
  * @param int $variables
  */
 function wbumenudomain_theme_suggestions_page_alter(array &$suggestions, array $variables) {
-  // dump(WbumenudomainMenuItemDecorating::getCurrentActiveDomaineByUrl());
+  // dump(\Drupal::routeMatch()->getRouteName());
   // if (str_contains(\Drupal::routeMatch()->getRouteName(), "wbumenudomain."))
   // {
   // $suggestions[] = 'page__wbumenudomain';
