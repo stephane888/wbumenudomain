@@ -146,13 +146,6 @@ class WbumenudomainSiteconfig extends WidgetBase {
   public function validateElement(array $element, FormStateInterface $form_state) {
     // die();
     $vals = $form_state->getUserInput();
-    $data = [
-      $vals['site_config'],
-      $form_state->getValue('site_config'),
-      $vals['site_config']
-    ];
-    debugLog::$max_depth = 6;
-    debugLog::kintDebugDrupal($data, 'validateElement', true);
     
     // name
     if (!empty($vals['site_config'][0]['siteconf']['container'])) {
