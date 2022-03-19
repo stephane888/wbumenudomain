@@ -3,6 +3,9 @@
     "description": "plugin wbu domain",
     "type": "drupal-module-custom",
     "license": "MIT",
+    "require": {
+        "drupal/domain": "^1.0@beta"
+    },
     "authors": [
         {
             "name": "stephane888",

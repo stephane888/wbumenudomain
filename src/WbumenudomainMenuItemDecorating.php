@@ -107,12 +107,16 @@ class WbumenudomainMenuItemDecorating extends DefaultMenuLinkTreeManipulators {
    * @return string
    */
   static public function getCurrentActiveDomaineByUrl() {
+    $domain = null;
     /**
      *
      * @var \Drupal\domain\DomainNegotiator $DomainNegotiator
      */
     $DomainNegotiator = \Drupal::service('domain.negotiator');
-    $domain = $DomainNegotiator->getActiveId();
+    if (!empty($DomainNegotiator->getActiveDomain())) {
+      $domain = $DomainNegotiator->getActiveId();
+    }
+    
     if (empty($domain))
       \Drupal::messenger()->addWarning("Ce domaine n'est pas encore enregitré");
     return $domain;

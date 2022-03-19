@@ -78,7 +78,7 @@ class WbumenudomainSiteconfig extends WidgetBase {
       $this->ThemeUtility->ActiveUseAjax();
     }
     // Si non, on recupere à partir de l'entité.( pour l'edition).
-    elseif (!$hostname) {
+    elseif (\Drupal::routeMatch()->getRouteName() == 'entity.config_theme_entity.edit_form') {
       // dump(\Drupal::routeMatch()->getParameters());
       /**
        *
@@ -108,7 +108,6 @@ class WbumenudomainSiteconfig extends WidgetBase {
     // static::class,
     // 'ConfigSaveSubmit__'
     // ];
-    
     if (!empty($hostname)) {
       $siteConf = $this->WbumenudomainConf->getValue('domain.config.' . $hostname . '.system.site');
       // die();

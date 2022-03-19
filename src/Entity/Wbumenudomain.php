@@ -224,7 +224,7 @@ class Wbumenudomain extends ContentEntityBase implements ContentEntityInterface 
       'weight' => -3
     ])->setDisplayConfigurable('form', TRUE)->setDisplayConfigurable('view', TRUE);
     //
-    $fields['hostname'] = BaseFieldDefinition::create('wbumenudomaineditlink')->setLabel(t(' Hostname ou nom de domaine (v2) '))->setRequired(TRUE)->setDisplayOptions('form', [
+    $fields['hostname'] = BaseFieldDefinition::create('wbumenudomaineditlink')->setLabel(t(" Hostname ou nom de domaine (v2) "))->setRequired(TRUE)->setDisplayOptions('form', [
       'type' => 'wbumenudomainhost',
       'settings' => [],
       'weight' => -3
