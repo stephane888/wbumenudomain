@@ -6,7 +6,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\domain_access\DomainAccessManagerInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\wbumenudomain\WbumenudomainMenuItemDecorating;
-use Stephane888\Debug\debugLog;
 use Drupal\wbumenudomain\WbumenuDomainFormStep;
 use Drupal\Component\Utility\NestedArray;
 
@@ -48,8 +47,7 @@ function wbumenudomain_entity_base_field_info(EntityTypeInterface $entity_type) 
     
     return $fields;
   }
-  // debugLog::$max_depth = 1;
-  // debugLog::kintDebugDrupal($entity_type, $entity_type->id(), true);
+  
   return $fields;
 }
 
@@ -137,18 +135,11 @@ function wbumenudomain_form_multistep(&$form, FormStateInterface $form_state) {
 function wbumenudomain_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   $form["#attributes"]['class'][] = 'container';
   $form["#attributes"]['class'][] = 'my-5';
-  // $multiStep = new WbumenuDomainFormStep($form, $form_state);
-  // $form = $multiStep->build();
-  // debugLog::$max_depth = 7;
-  // dump($form);
-  // debugLog::kintDebugDrupal($form, 'wbumenudomain_form_node_form_alter', true);
 }
 
 function _wbumenudomain_siteconfig_alter($form, FormStateInterface $form_state) {
   // $form_state->setUserInput([]);
   // return $form;
-  // debugLog::$max_depth = 10;
-  // debugLog::kintDebugDrupal($form_state->getValues(),
   // '_wbumenudomain_siteconfig_getValues');
   
   // name
@@ -156,7 +147,6 @@ function _wbumenudomain_siteconfig_alter($form, FormStateInterface $form_state) 
   // =
   // $form['field_site_information']['widget'][0]['siteconf']['container']['name']["#default_value"];
   //
-  // debugLog::kintDebugDrupal($form['field_site_information']['widget'][0]['siteconf']['container']['name'],
   // '_wbumenudomain_siteconfig_alter');
   return $form['field_site_information']['widget'][0]['siteconf']['container'];
 }
@@ -165,8 +155,7 @@ function _wbumenudomain_siteconfig_alter($form, FormStateInterface $form_state) 
  * Implements hook_views_data_alter().
  */
 function wbumenudomain_views_data_alter(array &$data) {
-  // debugLog::$max_depth = 7;
-  // debugLog::kintDebugDrupal($data['block_content_field_data'],
+  
   // 'wbumenudomain_views_data_alter' . rand(10, 999));
   /**
    * --
@@ -288,7 +277,7 @@ function wbumenudomain_commerce_product_access(\Drupal\commerce_product\Entity\P
  *        The form state of the parent form.
  */
 // function wbumenudomain_inline_entity_form_reference_form_alter(array &$reference_form, FormStateInterface &$form_state) {
-// debugLog::kintDebugDrupal($reference_form, 'wbumenudomain_inline_entity_form_reference_form_alter', true);
+//
 // }
 
 /**
@@ -298,11 +287,10 @@ function wbumenudomain_commerce_product_access(\Drupal\commerce_product\Entity\P
  * @param FormStateInterface $form_state
  */
 function wbumenudomain_inline_entity_form_entity_form_alter(array &$entity_form, FormStateInterface &$form_state) {
-  // debugLog::kintDebugDrupal($entity_form, 'wbumenudomain_inline_entity_form_entity_form_alter', true);
+  //
 }
 
 function wbumenudomain_inline_entity_form_table_fields_alter(array &$fields, array $context) {
-  // debugLog::kintDebugDrupal($fields, 'wbumenudomain_inline_entity_form_table_fields_alter', true);
   if ($context['entity_type'] == 'node') {
     $fields['nid'] = [
       'type' => 'field',
@@ -327,16 +315,10 @@ function wbumenudomain_inline_entity_form_table_fields_alter(array &$fields, arr
 }
 
 function wbumenudomain_field_widget_inline_entity_form_complex_form_alter(&$element, \Drupal\Core\Form\FormStateInterface $form_state, $context) {
-  // $debug = [
-  // $element,
-  // $context
-  // ];
-  // debugLog::kintDebugDrupal($debug, 'wbumenudomain_field_widget_inline_entity_form_complex_form_alter', true);
+  //
 }
 
 function wbumenudomain_field_widget_wbumenudomainhost_complex_inline_form_alter(&$element, \Drupal\Core\Form\FormStateInterface $form_state, $context) {
-  // debugLog::$max_depth = 5;
-  // debugLog::kintDebugDrupal($element, 'wbumenudomain_field_widget_wbumenudomainhost_complex_inline_form_alter', true);
   
   /**
    *
@@ -344,7 +326,6 @@ function wbumenudomain_field_widget_wbumenudomainhost_complex_inline_form_alter(
    */
   $items = $context['items'];
   
-  // debugLog::kintDebugDrupal($entities, 'wbumenudomain_field_widget_wbumenudomainhost_complex_inline_form_alter', true);
   // On n'essaie de faire des copie de contenus.
   if ($items->getEntity()->isNew()) {
     
@@ -399,9 +380,7 @@ function wbumenudomain_field_widget_wbumenudomainhost_complex_inline_form_alter(
         \Drupal::messenger()->addStatus($message);
       }
     }
-    // debugLog::kintDebugDrupal($element['entities'][0], 'wbumenudomain_field_widget_wbumenudomainhost_complex_inline_form_alter', true);
     // $form_values = NestedArray::getValue($form_state->getValues(), $reference_form['#parents']);
-    // debugLog::kintDebugDrupal($element['entities'][0], 'wbumenudomain_field_widget_wbumenudomainhost_complex_inline_form_alter', true);
   }
   else {
     // $widget = $context['widget'];

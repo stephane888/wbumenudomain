@@ -6,7 +6,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\wbumenudomain\Wbumenudomain;
-use Stephane888\Debug\debugLog;
+
 use Drupal\inline_entity_form\Plugin\Field\FieldWidget\InlineEntityFormComplex;
 
 /**
@@ -33,7 +33,7 @@ class WbumenudomainComplexInline extends InlineEntityFormComplex {
     // $entityTypeId = $items->getEntity()->bundle();
     
     if ($items->getFieldDefinition()->getName() == "field_logo_clients_nos_clients_00") {
-      // debugLog::kintDebugDrupal($element, 'WbumenudomainComplexInline', true);
+      
       /**
        *
        * @var \Drupal\node\Entity\Node $node
