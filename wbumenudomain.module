@@ -287,9 +287,9 @@ function wbumenudomain_commerce_product_access(\Drupal\commerce_product\Entity\P
  * @param \Drupal\Core\Form\FormStateInterface $form_state
  *        The form state of the parent form.
  */
-function wbumenudomain_inline_entity_form_reference_form_alter(array &$reference_form, FormStateInterface &$form_state) {
-  debugLog::kintDebugDrupal($reference_form, 'wbumenudomain_inline_entity_form_reference_form_alter', true);
-}
+// function wbumenudomain_inline_entity_form_reference_form_alter(array &$reference_form, FormStateInterface &$form_state) {
+// debugLog::kintDebugDrupal($reference_form, 'wbumenudomain_inline_entity_form_reference_form_alter', true);
+// }
 
 /**
  * S'execute lors de la MAJ d'un elment dans inline_form_entite.
