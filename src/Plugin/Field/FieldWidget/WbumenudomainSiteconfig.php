@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\wbumenudomain\Services\WbumenudomainSiteconfig as WbumenudomainConf;
 use Stephane888\HtmlBootstrap\ThemeUtility;
-
+use Drupal\Component\Serialization\Json;
 
 /**
  *
@@ -21,7 +21,8 @@ use Stephane888\HtmlBootstrap\ThemeUtility;
  *   label = @Translation(" Wbumenudomain Widget Site Config "),
  *   field_types = {
  *     "wbumenudomaineditlink",
- *   }
+ *   },
+ *   multiple_values = TRUE
  * )
  */
 class WbumenudomainSiteconfig extends WidgetBase {
@@ -71,7 +72,10 @@ class WbumenudomainSiteconfig extends WidgetBase {
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    // on recupere le domaine-id à partir du champs.
+    // get value
+    // dump($items[$delta]->value);
+    
+    // on recupere le domaine-id à partir du champs (via l'action ajax).
     $hostname = $form_state->getValue('hostname');
     if (!empty($hostname[0]['value'])) {
       $hostname = $hostname[0]['value'];
@@ -178,6 +182,26 @@ class WbumenudomainSiteconfig extends WidgetBase {
       '#description' => t(' Text that will be shown inside the field until a value is entered. This hint is usually a sample value or a brief description of the expected format. ')
     ];
     return $element;
+  }
+  
+  /**
+   *
+   * {@inheritdoc}
+   * @see \Drupal\Core\Field\WidgetBase::massageFormValues()
+   */
+  public function massageFormValues($values, $form, $form_state) {
+    // dump($values);
+    if (!empty($values['siteconf']['container'])) {
+      return [
+        'value' => Json::encode($values['siteconf']['container'])
+      ];
+    }
+    elseif (!empty($values['page.front'])) {
+      return [
+        'value' => Json::encode($values)
+      ];
+    }
+    return parent::massageFormValues($values, $form, $form_state);
   }
   
 }
