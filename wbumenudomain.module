@@ -32,8 +32,11 @@ function wbumenudomain_entity_base_field_info(EntityTypeInterface $entity_type) 
     return $fields;
   }
   elseif ($entity_type->id() === 'block_content') {
-    $list = \Drupal::entityTypeManager()->getStorage('domain')->loadOptionsList();
-    $fields[DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD] = BaseFieldDefinition::create('list_string')->setLabel(t(' Domain Access '))->setRequired(FALSE)->setSetting('allowed_values', $list)->setDisplayConfigurable('form', TRUE)->setDisplayConfigurable('view', TRUE)->setDisplayOptions('form', [
+    // $list = \Drupal::entityTypeManager()->getStorage('domain')->loadOptionsList();
+    $fields[DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD] = BaseFieldDefinition::create('list_string')->setLabel(t(' Domain Access '))->setRequired(FALSE)->setSetting('allowed_values_function', [
+      '\Drupal\wbumenudomain\Wbumenudomain',
+      'getAlldomaines'
+    ])->setDisplayConfigurable('form', TRUE)->setDisplayConfigurable('view', TRUE)->setDisplayOptions('form', [
       'type' => 'options_select',
       'settings' => [],
       'weight' => -3
