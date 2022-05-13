@@ -249,6 +249,8 @@ function wbumenudomain_entity_access(\Drupal\Core\Entity\EntityInterface $entity
  * @param \Drupal\Core\Session\AccountInterface $account
  */
 function wbumenudomain_commerce_product_access(\Drupal\commerce_product\Entity\Product $product, $operation, \Drupal\Core\Session\AccountInterface $account) {
+
+// return AccessResult::allowed();
   if (in_array('administrator', $account->getRoles())) {
     return AccessResult::allowed();
   }
